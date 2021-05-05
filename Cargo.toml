@@ -1,0 +1,12 @@
+[package]
+name = "imgur_link_generator"
+version = "0.1.0"
+authors = ["Ayes <52951851+ayes-web@users.noreply.github.com>"]
+edition = "2018"
+license = "GPLv2"
+description = "Brute-forces imgur image links"
+
+[dependencies]
+rand = "0.8.3"
+clap = "2.33.3"
+curl = "0.4.36"
