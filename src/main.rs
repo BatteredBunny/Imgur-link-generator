@@ -3,6 +3,9 @@ use std::io::{stdout, Write};
 use clap::{Arg, App};
 use curl::easy::Easy;
 
+use std::thread;
+use std::sync::mpsc;
+
 fn generate_code(code_length: i32, extension: &str) -> String {
     let mut rng = thread_rng();
 
@@ -66,37 +69,119 @@ fn main() {
     let spinner = "⣾⣽⣻⢿⡿⣟⣯⣷";
     let progress_text = "Generating code";
 
-    let mut easy = Easy::new();
+    for _ in 1..=amount {
 
-    for mut num in 1..=amount {
-        progress_spinnerino(num as usize, spinner, &progress_text);
+        let (tx1, rx) = mpsc::channel();
+        let tx2 = tx1.clone();
+        let tx3 = tx1.clone();
+        let tx4 = tx1.clone();
 
-        let mut code = generate_code(code_length, extension);
+        let mut response_code = 302;
+        let mut index: i32 = 0;
 
-        easy.url(&code).unwrap();
-        easy.perform().unwrap();
+        let thread1 = thread::spawn(move || {
+            let mut easy = Easy::new();
+            let mut code = String::new();
 
-        let mut failed_amount: i32 = 0;
-
-        while easy.response_code().unwrap() == 302 {
-            if show_tries {
-                failed_amount += 1;
-                let failed_text = format!("Failed {} times. ({})", failed_amount, code);
-                progress_spinnerino(num as usize, spinner, &failed_text);
-            } else {
-                progress_spinnerino(num as usize, spinner, &progress_text);
+            while response_code == 302 {
+                if show_tries {
+                    let failed_text = format!("Attempt {} ({})", index, &code);
+                    progress_spinnerino(index as usize, spinner, &failed_text);
+                } else {
+                    progress_spinnerino(index as usize, spinner, &progress_text);
+                }
+    
+                code = generate_code(code_length, extension);
+    
+                easy.url(&code).unwrap();
+                easy.perform().unwrap();
+    
+                index += 1;
+                response_code = easy.response_code().unwrap();
             }
+            tx1.send(code).unwrap();
+        });
 
-            code = generate_code(code_length, extension);
+        let thread2 = thread::spawn(move || {
+            let mut easy = Easy::new();
+            let mut code = String::new();
 
-            easy.url(&code).unwrap();
-            easy.perform().unwrap();
+            while response_code == 302 {
+                if show_tries {
+                    let failed_text = format!("Attempt {} ({})", index, &code);
+                    progress_spinnerino(index as usize, spinner, &failed_text);
+                } else {
+                    progress_spinnerino(index as usize, spinner, &progress_text);
+                }
+    
+                code = generate_code(code_length, extension);
+    
+                easy.url(&code).unwrap();
+                easy.perform().unwrap();
+    
+                index += 1;
+                response_code = easy.response_code().unwrap();
+            }
+            tx2.send(code).unwrap();
+        });
 
-            num += 1;
-        }
+        let thread3 = thread::spawn(move || {
+            let mut easy = Easy::new();
+            let mut code = String::new();
+
+            while response_code == 302 {
+                if show_tries {
+                    let failed_text = format!("Attempt {} ({})", index, &code);
+                    progress_spinnerino(index as usize, spinner, &failed_text);
+                } else {
+                    progress_spinnerino(index as usize, spinner, &progress_text);
+                }
+    
+                code = generate_code(code_length, extension);
+    
+                easy.url(&code).unwrap();
+                easy.perform().unwrap();
+    
+                index += 1;
+                response_code = easy.response_code().unwrap();
+            }
+            tx3.send(code).unwrap();
+        });
+
+        let thread4 = thread::spawn(move || {
+            let mut easy = Easy::new();
+            let mut code = String::new();
+
+            while response_code == 302 {
+                if show_tries {
+                    let failed_text = format!("Attempt {} ({})", index, &code);
+                    progress_spinnerino(index as usize, spinner, &failed_text);
+                } else {
+                    progress_spinnerino(index as usize, spinner, &progress_text);
+                }
+    
+                code = generate_code(code_length, extension);
+    
+                easy.url(&code).unwrap();
+                easy.perform().unwrap();
+    
+                index += 1;
+                response_code = easy.response_code().unwrap();
+            }
+            tx4.send(code).unwrap();
+        });
+
+        
+        let final_code = rx.recv().unwrap();
+
+        thread1.join().unwrap();
+        thread2.join().unwrap();
+        thread3.join().unwrap();
+        thread4.join().unwrap();
 
         stdout().flush().unwrap();
     
-        print!("\r{}                                              \n", code);
+        print!("\r{}                                              \n", final_code);
+
     }
 }
