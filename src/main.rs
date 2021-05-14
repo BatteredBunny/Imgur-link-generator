@@ -51,7 +51,13 @@ fn main() {
         .value_name("Bool")
         .default_value("false")
         .help("Shows failed tries")
-    ).get_matches();
+    ).arg(Arg::with_name("raw")
+        .short("r")
+        .long("raw")
+        .value_name("Bool")
+        .default_value("false")
+        .help("Sends raw results")
+)   .get_matches();
 
     let code_length: i32 = matches.value_of("length").unwrap()
         .parse::<i32>()
@@ -62,6 +68,10 @@ fn main() {
         .unwrap();
 
     let show_tries: bool = matches.value_of("tries").unwrap()
+        .parse::<bool>()
+        .unwrap();
+
+    let raw: bool = matches.value_of("raw").unwrap()
         .parse::<bool>()
         .unwrap();
 
@@ -77,18 +87,22 @@ fn main() {
         let tx4 = tx1.clone();
 
         let mut response_code = 302;
+
         let mut index: i32 = 0;
 
         let thread1 = thread::spawn(move || {
             let mut easy = Easy::new();
             let mut code = String::new();
 
-            while response_code == 302 {
-                if show_tries {
-                    let failed_text = format!("Attempt {} ({})", index, &code);
-                    progress_spinnerino(index as usize, spinner, &failed_text);
-                } else {
-                    progress_spinnerino(index as usize, spinner, &progress_text);
+            while response_code == 302 && response_code != 429 {
+                if !raw {
+                    if show_tries {
+                        let failed_text = format!("Attempt {} ({})", index, &code);
+                        progress_spinnerino(index as usize, spinner, &failed_text);
+                    } else {
+                        progress_spinnerino(index as usize, spinner, &progress_text);
+                    }
+                        index += 1;
                 }
     
                 code = generate_code(code_length, extension);
@@ -96,22 +110,27 @@ fn main() {
                 easy.url(&code).unwrap();
                 easy.perform().unwrap();
     
-                index += 1;
                 response_code = easy.response_code().unwrap();
             }
+            if response_code == 429 {
+                panic!("You seemed to have been blocked!");
+            }
+
             tx1.send(code).unwrap();
         });
-
         let thread2 = thread::spawn(move || {
             let mut easy = Easy::new();
             let mut code = String::new();
 
-            while response_code == 302 {
-                if show_tries {
-                    let failed_text = format!("Attempt {} ({})", index, &code);
-                    progress_spinnerino(index as usize, spinner, &failed_text);
-                } else {
-                    progress_spinnerino(index as usize, spinner, &progress_text);
+            while response_code == 302 && response_code != 429 {
+                if !raw {
+                    if show_tries {
+                        let failed_text = format!("Attempt {} ({})", index, &code);
+                        progress_spinnerino(index as usize, spinner, &failed_text);
+                    } else {
+                        progress_spinnerino(index as usize, spinner, &progress_text);
+                    }
+                        index += 1;
                 }
     
                 code = generate_code(code_length, extension);
@@ -119,9 +138,12 @@ fn main() {
                 easy.url(&code).unwrap();
                 easy.perform().unwrap();
     
-                index += 1;
                 response_code = easy.response_code().unwrap();
             }
+            if response_code == 429 {
+                panic!("You seemed to have been blocked!");
+            }
+
             tx2.send(code).unwrap();
         });
 
@@ -129,12 +151,15 @@ fn main() {
             let mut easy = Easy::new();
             let mut code = String::new();
 
-            while response_code == 302 {
-                if show_tries {
-                    let failed_text = format!("Attempt {} ({})", index, &code);
-                    progress_spinnerino(index as usize, spinner, &failed_text);
-                } else {
-                    progress_spinnerino(index as usize, spinner, &progress_text);
+            while response_code == 302 && response_code != 429 {
+                if !raw {
+                    if show_tries {
+                        let failed_text = format!("Attempt {} ({})", index, &code);
+                        progress_spinnerino(index as usize, spinner, &failed_text);
+                    } else {
+                        progress_spinnerino(index as usize, spinner, &progress_text);
+                    }
+                        index += 1;
                 }
     
                 code = generate_code(code_length, extension);
@@ -142,9 +167,12 @@ fn main() {
                 easy.url(&code).unwrap();
                 easy.perform().unwrap();
     
-                index += 1;
                 response_code = easy.response_code().unwrap();
             }
+            if response_code == 429 {
+                panic!("You seemed to have been blocked!");
+            }
+
             tx3.send(code).unwrap();
         });
 
@@ -152,12 +180,15 @@ fn main() {
             let mut easy = Easy::new();
             let mut code = String::new();
 
-            while response_code == 302 {
-                if show_tries {
-                    let failed_text = format!("Attempt {} ({})", index, &code);
-                    progress_spinnerino(index as usize, spinner, &failed_text);
-                } else {
-                    progress_spinnerino(index as usize, spinner, &progress_text);
+            while response_code == 302 && response_code != 429 {
+                if !raw {
+                    if show_tries {
+                        let failed_text = format!("Attempt {} ({})", index, &code);
+                        progress_spinnerino(index as usize, spinner, &failed_text);
+                    } else {
+                        progress_spinnerino(index as usize, spinner, &progress_text);
+                    }
+                        index += 1;
                 }
     
                 code = generate_code(code_length, extension);
@@ -165,12 +196,14 @@ fn main() {
                 easy.url(&code).unwrap();
                 easy.perform().unwrap();
     
-                index += 1;
                 response_code = easy.response_code().unwrap();
             }
+            if response_code == 429 {
+                panic!("You seemed to have been blocked!");
+            }
+            
             tx4.send(code).unwrap();
         });
-
         
         let final_code = rx.recv().unwrap();
 
@@ -179,9 +212,12 @@ fn main() {
         thread3.join().unwrap();
         thread4.join().unwrap();
 
-        stdout().flush().unwrap();
-    
-        print!("\r{}                                              \n", final_code);
+        if !raw {
+            stdout().flush().unwrap();
+            print!("\r{}                                              \n", final_code);
+        } else {
+            println!("{}", final_code);
+        }
 
     }
 }
