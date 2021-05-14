@@ -31,7 +31,7 @@ fn progress_spinnerino(index: usize, animation: &str, secondary_text: &str) {
 
 fn main() {
     let matches = App::new("imgur link generator")
-    .version("0.1.0")
+    .version("0.1.1")
     .arg(Arg::with_name("length")
         .short("l")
         .long("length")
