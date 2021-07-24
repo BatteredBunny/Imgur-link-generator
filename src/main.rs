@@ -1,10 +1,9 @@
 use rand::{thread_rng, Rng};
 use std::io::{stdout, Write};
-use clap::{Arg, App};
 use curl::easy::Easy;
-
-use std::thread;
+use std::{thread, env};
 use std::sync::mpsc;
+use std::process::exit;
 
 fn generate_code(code_length: i32, extension: &str) -> String {
     let mut rng = thread_rng();
@@ -30,50 +29,57 @@ fn progress_spinnerino(index: usize, animation: &str, secondary_text: &str) {
 }
 
 fn main() {
-    let matches = App::new("imgur link generator")
-    .version("0.1.1")
-    .arg(Arg::with_name("length")
-        .short("l")
-        .long("length")
-        .value_name("Int")
-        .default_value("5")
-        .help("Changes generated imgur code lenght")
-        .takes_value(true)
-    ).arg(Arg::with_name("amount")
-        .short("a")
-        .long("amount")
-        .value_name("Int")
-        .default_value("1")
-        .help("How many codes to generate")
-    ).arg(Arg::with_name("tries")
-        .short("t")
-        .long("tries")
-        .value_name("Bool")
-        .default_value("false")
-        .help("Shows failed tries")
-    ).arg(Arg::with_name("raw")
-        .short("r")
-        .long("raw")
-        .value_name("Bool")
-        .default_value("false")
-        .help("Sends raw results")
-)   .get_matches();
+    let args: Vec<String> = env::args().collect();
 
-    let code_length: i32 = matches.value_of("length").unwrap()
-        .parse::<i32>()
-        .unwrap();
+    let mut code_length: i32 = 5;
+    let mut amount: i32 = 1;
+    let mut show_tries: bool = false;
+    let mut raw: bool = false;
 
-    let amount: i32 = matches.value_of("amount").unwrap()
-        .parse::<i32>()
-        .unwrap();
+    let mut found_flag: bool = false;
+    for i in 1..args.len() {
+        if args[i] == "-h" || args[i] == "--help" {
+            println!("imgur link generator 0.1.2");
 
-    let show_tries: bool = matches.value_of("tries").unwrap()
-        .parse::<bool>()
-        .unwrap();
+            println!("USAGE:");
+            println!("imgur_link_generator [OPTIONS]");
 
-    let raw: bool = matches.value_of("raw").unwrap()
-        .parse::<bool>()
-        .unwrap();
+            println!("FLAGS:");
+            println!("  -h, --help       Prints help information");
+            println!("  -V, --version    Prints version information");
+
+            println!("OPTIONS:");
+            println!("  -a, --amount <Int>    How many codes to generate [default: 1]");
+            println!("  -l, --length <Int>    Changes generated imgur code lenght [default: 5]");
+            println!("  -r, --raw <Bool>      Sends raw results [default: false]");
+            println!("  -t, --tries <Bool>    Shows failed tries [default: false]");
+
+            exit(1)
+        } else if args[i] == "-V" || args[i] == "--version" {
+            println!("0.1.1");
+            exit(1)
+        } else if args[i] == "-l" || args[i] == "--lenght" {
+            found_flag = true;
+        } else if args[i] == "-a" || args[i] == "--amount" {
+            found_flag = true;
+        } else if args[i] == "-t" || args[i] == "--tries" {
+            found_flag = true;
+        } else if args[i] == "-r" || args[i] == "--raw" {
+            found_flag = true;
+        } else if found_flag {
+            if args[i-1] == "-l" || args[i-1] == "--lenght" {
+                code_length = args[i].parse::<i32>().unwrap();
+            } else if args[i-1] == "-a" || args[i-1] == "--amount" {
+                amount = args[i].parse::<i32>().unwrap();
+            } else if args[i-1] == "-t" || args[i-1] == "--tries" {
+                show_tries = args[i].parse::<bool>().unwrap();
+            } else if args[i-1] == "-r" || args[i-1] == "--raw" {
+                raw = args[i].parse::<bool>().unwrap();
+            }
+
+            found_flag = false;
+        }
+    }
 
     let extension: &str = ".jpg";
     let spinner = "⣾⣽⣻⢿⡿⣟⣯⣷";
