@@ -1,11 +1,15 @@
 [package]
 name = "imgur_link_generator"
-version = "0.1.2"
+version = "0.2.0"
 authors = ["Ayes <52951851+ayes-web@users.noreply.github.com>"]
-edition = "2018"
+edition = "2021"
 license = "GPLv2"
 description = "Brute-forces imgur image links"
 
 [dependencies]
-rand = "0.8.3"
-curl = "0.4.36"
+rand = "0.8.5"
+curl = "0.4.43"
+clap = { version = "3.1.6", features = ["derive"] }
+
+[profile.release]
+strip = true
