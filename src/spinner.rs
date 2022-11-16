@@ -3,40 +3,33 @@ use std::str::Chars;
 use std::time::{Duration, Instant};
 
 pub struct Spinner<'a> {
+    current: char,
     spinner: Cycle<Chars<'a>>,
     last_call: Instant
 }
 
-pub struct SpinnerChar {
-    pub ch: char,
-    pub kind: SpinnerKind
-}
-
-pub enum SpinnerKind {
-    Ok,
-    TooSoon
+pub enum SpinnerResult {
+    Ok(char),
+    TooSoon(char)
 }
 
 impl<'a> Spinner<'a> {
     pub fn new() -> Self {
         Spinner {
+            current: '⣾',
             spinner: "⣾⣽⣻⢿⡿⣟⣯⣷".chars().cycle(),
             last_call: Instant::now()
         }
     }
 
-    pub fn next(&mut self) -> SpinnerChar {
+    pub fn next(&mut self) -> SpinnerResult {
         if self.last_call.elapsed() > Duration::from_millis(100) {
             self.last_call = Instant::now();
-            SpinnerChar {
-                ch: self.spinner.next().unwrap(),
-                kind: SpinnerKind::Ok
-            }
-        } else {
-            SpinnerChar {
-                ch: self.spinner.clone().take(1).next().unwrap(),
-                kind: SpinnerKind::TooSoon
-            }
+            self.current = self.spinner.next().unwrap();
+            
+            SpinnerResult::Ok(self.current)
+        } else { 
+            SpinnerResult::TooSoon(self.current)
         }
     }
 }

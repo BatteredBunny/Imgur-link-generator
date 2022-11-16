@@ -1,17 +1,17 @@
 [package]
 name = "imgur_link_generator"
-version = "0.2.0"
+version = "0.3.0"
 authors = ["Ayes <ayes2022@protonmail.com>"]
 edition = "2021"
 license = "GPLv2"
 description = "Brute-forces imgur image links"
 
 [dependencies]
-fastrand = "1.7.0"
-clap = { version = "3.1.6", features = ["derive"] }
+fastrand = "1.8.0"
+clap = { version = "4.0.26", features = ["derive"] }
 
-tokio = { version = "1.17.0", features = ["full"] }
-reqwest = "0.11.10"
+tokio = { version = "1.21.2", features = ["full"] }
+reqwest = "0.11.13"
 
 [profile.release]
 strip = true
