@@ -1,5 +1,3 @@
-extern crate test;
-
 use std::str;
 
 pub struct CodeGenerator {
@@ -28,6 +26,7 @@ impl CodeGenerator {
 
 #[cfg(test)]
 mod tests {
+    extern crate test;
     use test::Bencher;
 
     use super::*;
