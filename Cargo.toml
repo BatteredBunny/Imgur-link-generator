@@ -3,7 +3,7 @@ name = "imgur_link_generator"
 version = "0.3.0"
 authors = ["Ayes <ayes2022@protonmail.com>"]
 edition = "2021"
-license = "GPLv2"
+license = "GPLv3"
 description = "Brute-forces imgur image links"
 
 [dependencies]
