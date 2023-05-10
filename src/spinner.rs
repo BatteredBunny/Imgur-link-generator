@@ -5,12 +5,12 @@ use std::time::{Duration, Instant};
 pub struct Spinner<'a> {
     current: char,
     spinner: Cycle<Chars<'a>>,
-    last_call: Instant
+    last_call: Instant,
 }
 
 pub enum SpinnerResult {
     Ok(char),
-    TooSoon(char)
+    TooSoon(char),
 }
 
 impl<'a> Spinner<'a> {
@@ -18,7 +18,7 @@ impl<'a> Spinner<'a> {
         Spinner {
             current: '⣾',
             spinner: "⣾⣽⣻⢿⡿⣟⣯⣷".chars().cycle(),
-            last_call: Instant::now()
+            last_call: Instant::now(),
         }
     }
 
@@ -26,9 +26,9 @@ impl<'a> Spinner<'a> {
         if self.last_call.elapsed() > Duration::from_millis(100) {
             self.last_call = Instant::now();
             self.current = self.spinner.next().unwrap();
-            
+
             SpinnerResult::Ok(self.current)
-        } else { 
+        } else {
             SpinnerResult::TooSoon(self.current)
         }
     }
