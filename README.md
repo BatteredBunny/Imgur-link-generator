@@ -1,17 +1,17 @@
 # Imgur link generator
- Brute-forces imgur image links
+
+<a href="https://asciinema.org/a/583804" target="_blank"><img src="https://asciinema.org/a/583804.svg" /></a>
 
 ```
-imgur_link_generator 0.2.0
+Brute-forces imgur image links
 
-USAGE:
-    imgur_link_generator [OPTIONS]
+Usage: imgur_link_generator [OPTIONS]
 
-OPTIONS:
-    -a, --amount <AMOUNT>      How many codes to generate [default: 1]
-    -h, --help                 Print help information
-    -l, --length <LENGTH>      Generated imgur code length [default: 5]
-    -t, --threads <THREADS>    how many threads to run on [default: 24]
-        --tries                Shows failed tries [default: false]
-    -V, --version              Print version information
+Options:
+  -l, --length <LENGTH>  Generated imgur code length [default: 5] [default: 5]
+  -a, --amount <AMOUNT>  How many codes to generate [default: 1] [default: 1]
+  -s, --spinner          Enables progress spinner [default: true]
+      --tries            Shows failed tries in spinner [default: false]
+  -h, --help             Print help
+  -V, --version          Print version
 ```
