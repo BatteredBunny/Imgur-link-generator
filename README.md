@@ -2,6 +2,13 @@
 
 <a href="https://asciinema.org/a/583804" target="_blank"><img src="https://asciinema.org/a/583804.svg" /></a>
 
+## How to build?
+
+[First install rust](https://rustup.rs/) then run
+```
+cargo build --release
+```
+
 ```
 Brute-forces imgur image links
 
