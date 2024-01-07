@@ -1,7 +1,7 @@
 [package]
 name = "imgur_link_generator"
 version = "0.3.2"
-authors = ["ayes-web <ayes2022@protonmail.com>"]
+authors = ["BatteredBunny <ayes2022@protonmail.com>"]
 edition = "2021"
 license = "GPLv3"
 description = "Brute-forces imgur image links"
